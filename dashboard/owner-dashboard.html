@@ -1,1 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Owner Dashboard</title>
+    <link rel="stylesheet" href="owner-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <div id="ownerAuth">
+        <div class="auth-container">
+            <div class="auth-icon">&#127869;&#65039;</div>
+
+            <div id="signupForm">
+                <h1>Create Your Account</h1>
+                <p class="auth-subtitle">Start managing your restaurant</p>
+
+                <div class="error-message" id="signupError"></div>
+
+                <form onsubmit="handleSignup(event)">
+                    <div class="auth-form-group">
+                        <label for="restaurantName">Restaurant Name</label>
+                        <input type="text" id="restaurantName" placeholder="e.g., Spice Fusion" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="ownerEmail">Email Address</label>
+                        <input type="email" id="ownerEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="ownerPhoneNumber">Phone Number</label>
+                        <div class="phone-number-group">
+                            <select id="ownerCountryCode" class="country-select" required></select>
+                            <div class="phone-input-wrapper">
+                                <span class="dial-code-badge" id="selectedDialCode">+91</span>
+                                <input type="tel" id="ownerPhoneNumber" placeholder="9876543210" inputmode="numeric"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="ownerPassword">Password</label>
+                        <input type="password" id="ownerPassword" placeholder="Create a password" required>
+                        <p class="auth-hint">Use at least 8 characters with uppercase, lowercase, number, and special
+                            character.</p>
+                    </div>
+                    <button type="submit" class="btn-auth">Create Account</button>
+                </form>
+
+                <div class="auth-toggle">
+                    Already have an account? <a onclick="showLogin()">Login</a>
+                </div>
+            </div>
+
+            <div id="signupVerificationForm" style="display:none;">
+                <h1>Verify Sign-Up</h1>
+                <p class="auth-subtitle">Enter the 6-digit verification code to complete account creation</p>
+
+                <div class="error-message" id="signupVerificationError"></div>
+                <div class="info-message" id="signupCodeInfo"></div>
+
+                <form onsubmit="verifySignupCode(event)">
+                    <div class="auth-form-group">
+                        <label for="signupVerificationCode">Verification Code</label>
+                        <input type="text" id="signupVerificationCode" placeholder="Enter 6-digit code" maxlength="6"
+                            inputmode="numeric" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Verify &amp; Create Account</button>
+                    <button type="button" class="btn-auth-secondary" onclick="resendSignupCode()">Resend Code</button>
+                </form>
+
+                <div class="auth-toggle">
+                    Entered wrong details? <a onclick="backToSignupFromVerification()">Back to Sign Up</a>
+                </div>
+            </div>
+
+            <div id="loginForm" style="display:none;">
+                <h1>Welcome Back</h1>
+                <p class="auth-subtitle">Login to your restaurant dashboard</p>
+
+                <div class="error-message" id="loginError"></div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="auth-form-group">
+                        <label for="loginIdentifier">Email or Phone Number</label>
+                        <input type="text" id="loginIdentifier" placeholder="your@email.com or +91 9876543210" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Login</button>
+                </form>
+
+                <div class="auth-toggle" style="margin-top: 10px;">
+                    <a onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+
+                <div class="auth-toggle">
+                    Don't have an account? <a onclick="showSignup()">Sign Up</a>
+                </div>
+            </div>
+
+            <div id="loginVerificationForm" style="display:none;">
+                <h1>Verify Login</h1>
+                <p class="auth-subtitle">Enter the 6-digit code to continue</p>
+
+                <div class="error-message" id="loginVerificationError"></div>
+                <div class="info-message" id="loginCodeInfo"></div>
+
+                <form onsubmit="verifyLoginCode(event)">
+                    <div class="auth-form-group">
+                        <label for="loginVerificationCode">Verification Code</label>
+                        <input type="text" id="loginVerificationCode" placeholder="Enter 6-digit code" maxlength="6"
+                            inputmode="numeric" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Verify &amp; Login</button>
+                    <button type="button" class="btn-auth-secondary" onclick="resendLoginCode()">Resend Code</button>
+                </form>
+
+                <div class="auth-toggle">
+                    Need to re-enter credentials? <a onclick="backToLoginFromVerification()">Back to Login</a>
+                </div>
+            </div>
+
+            <div id="forgotPasswordForm" style="display:none;">
+                <h1>Forgot Password</h1>
+                <p class="auth-subtitle">Verify with your registered email and phone number</p>
+
+                <div class="error-message" id="forgotPasswordError"></div>
+
+                <form onsubmit="handleForgotPassword(event)">
+                    <div class="auth-form-group">
+                        <label for="forgotEmail">Registered Email</label>
+                        <input type="email" id="forgotEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="forgotPhoneNumber">Registered Phone Number</label>
+                        <div class="phone-number-group">
+                            <select id="forgotCountryCode" class="country-select" required></select>
+                            <div class="phone-input-wrapper no-badge">
+                                <input type="tel" id="forgotPhoneNumber" placeholder="9876543210" inputmode="numeric"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-auth">Send Reset Code</button>
+                </form>
+
+                <div class="auth-toggle">
+                    Remembered password? <a onclick="showLogin()">Back to Login</a>
+                </div>
+            </div>
+
+            <div id="resetVerificationForm" style="display:none;">
+                <h1>Verify Reset Code</h1>
+                <p class="auth-subtitle">Enter the 6-digit reset code</p>
+
+                <div class="error-message" id="resetVerificationError"></div>
+                <div class="info-message" id="resetCodeInfo"></div>
+
+                <form onsubmit="verifyResetCode(event)">
+                    <div class="auth-form-group">
+                        <label for="resetVerificationCode">Reset Code</label>
+                        <input type="text" id="resetVerificationCode" placeholder="Enter 6-digit code" maxlength="6"
+                            inputmode="numeric" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Verify Code</button>
+                    <button type="button" class="btn-auth-secondary" onclick="resendResetCode()">Resend Code</button>
+                </form>
+
+                <div class="auth-toggle">
+                    <a onclick="showForgotPassword()">Back</a>
+                </div>
+            </div>
+
+            <div id="resetPasswordForm" style="display:none;">
+                <h1>Set New Password</h1>
+                <p class="auth-subtitle">Create a strong password for your account</p>
+
+                <div class="error-message" id="resetPasswordError"></div>
+
+                <form onsubmit="completePasswordReset(event)">
+                    <div class="auth-form-group">
+                        <label for="resetNewPassword">New Password</label>
+                        <input type="password" id="resetNewPassword" placeholder="Enter new password" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="resetConfirmPassword">Confirm New Password</label>
+                        <input type="password" id="resetConfirmPassword" placeholder="Confirm new password" required>
+                    </div>
+                    <button type="submit" class="btn-auth">Reset Password</button>
+                </form>
+
+                <div class="auth-toggle">
+                    <a onclick="showLogin()">Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" style="display:none;">
+        <div class="header">
+            <div class="header-left">
+                <h1 id="restaurantHeader">&#127869;&#65039; Restaurant Dashboard</h1>
+                <p>Manage your restaurant operations</p>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">&#128682; Logout</button>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="orders" onclick="switchTab('orders')">&#128203; Orders</button>
+            <button class="nav-tab" data-tab="tables" onclick="switchTab('tables')">&#129681; Tables</button>
+            <button class="nav-tab" data-tab="billing" onclick="switchTab('billing')">&#128179; Billing</button>
+            <button class="nav-tab" data-tab="menu" onclick="switchTab('menu')">&#128214; Menu</button>
+            <button class="nav-tab" data-tab="qr" onclick="switchTab('qr')">&#128241; QR Code</button>
+            <button class="nav-tab" data-tab="settings" onclick="switchTab('settings')">&#9881;&#65039;
+                Settings</button>
+            <button class="nav-tab" data-tab="reviews" onclick="switchTab('reviews')">&#11088; Reviews</button>
+            <button class="nav-tab" data-tab="analytics" onclick="switchTab('analytics')">&#128202; Analytics</button>
+            <button class="nav-tab" data-tab="staff" onclick="switchTab('staff')">&#128101; Staff</button>
+            <button class="nav-tab" data-tab="orderhistory" onclick="switchTab('orderhistory')">&#128220; Order
+                History</button>
+        </div>
+
+        <div id="orders-section" class="section active">
+            <div class="orders-grid" id="orders-container"></div>
+        </div>
+
+        <div id="tables-section" class="section">
+            <div class="table-management-controls">
+                <h2>&#129681; Table Management</h2>
+                <div class="table-add-row">
+                    <input type="text" id="newTableNumber" placeholder="Enter Table Number" inputmode="numeric">
+                    <button class="btn-add-table" onclick="addTable()">&#10133; Add Table</button>
+                </div>
+            </div>
+            <div class="tables-grid" id="tables-container"></div>
+        </div>
+
+        <div id="billing-section" class="section">
+            <div class="billing-grid" id="billing-container"></div>
+        </div>
+
+        <div id="menu-section" class="section">
+            <form id="addMenuForm" class="menu-add-form" onsubmit="addMenuItem(event)">
+                <h2>Add New Menu Item</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="newItemName">Item Name *</label>
+                        <input type="text" id="itemName" placeholder="e.g., Butter Chicken" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newItemPrice">Price (&#8377;) *</label>
+                        <input type="number" id="itemPrice" placeholder="0" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newItemCategory">Category *</label>
+                        <select id="itemCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Starters">&#11088; Starters</option>
+                            <option value="Main Course">&#127835; Main Course</option>
+                            <option value="Indian Breads">&#129747; Indian Breads</option>
+                            <option value="Rice">&#127834; Rice</option>
+                            <option value="Snacks">&#127839; Snacks</option>
+                            <option value="Desserts">&#127854; Desserts</option>
+                            <option value="Drinks">&#129380; Drinks</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type *</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="itemType" value="veg" checked>
+                                &#128994; Veg
+                            </label>
+                            <label>
+                                <input type="radio" name="itemType" value="nonveg">
+                                &#128308; Non-Veg
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="newItemImage">Dish Image</label>
+                    <input type="file" id="itemImage" accept="image/*" onchange="previewImage(event)">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
+                <button type="submit" class="btn"
+                    style="background: #28a745; color: white; padding: 12px 20px; width: 100%; margin-top: 15px;">
+                    &#10133; Add Item
+                </button>
+            </form>
+
+            <div
+                style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);">
+                <h2 style="margin-bottom: 20px; color: #333;">Current Menu Items</h2>
+                <div id="menu-items-container"></div>
+            </div>
+        </div>
+
+        <div id="qr-section" class="section">
+            <div class="qr-container">
+                <h2>&#128241; Customer Menu QR Code</h2>
+                <p style="color: #666; margin-bottom: 20px;">Generate QR code for customers to scan and order</p>
+                <div style="margin-bottom: 15px; text-align: left;">
+                    <label for="qrBaseUrlInput"
+                        style="display:block; font-weight:600; margin-bottom:6px; color:#333;">Customer Site Base
+                        URL</label>
+                    <input type="url" id="qrBaseUrlInput" placeholder="https://your-restaurant-site.com"
+                        style="width:100%; padding:12px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px;">
+                    <button type="button" class="btn-generate-qr" style="margin-top:10px; width:100%; padding:12px;"
+                        onclick="saveQrBaseUrl()">Save URL</button>
+                    <p style="font-size:12px; color:#666; margin-top:6px;">Used when generating QR codes in production.
+                    </p>
+                </div>
+                <button class="btn-generate-qr" onclick="generateQR()">Generate QR Code</button>
+
+                <div id="qrDisplay" class="qr-display">
+                    <img id="qrImage" src="" alt="QR Code">
+                    <div class="qr-url">
+                        <strong>Customer URL:</strong><br>
+                        <span id="customerUrl"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-section" class="section">
+            <div class="settings-container">
+                <h2 style="margin-bottom: 30px; color: #333; text-align: center;">&#9881;&#65039; Restaurant Settings
+                </h2>
+
+                <div class="settings-group">
+                    <label for="settingsRestaurantName">Restaurant Name</label>
+                    <input type="text" id="settingsRestaurantName" placeholder="Restaurant Name">
+                </div>
+
+                <div class="settings-group">
+                    <label for="settingsOwnerEmail">Email Address</label>
+                    <input type="email" id="settingsOwnerEmail" placeholder="your@email.com">
+                </div>
+
+                <div class="settings-group">
+                    <label for="settingsOwnerPhoneNumber">Phone Number</label>
+                    <div class="phone-number-group">
+                        <select id="settingsOwnerCountryCode" class="country-select"></select>
+                        <div class="phone-input-wrapper no-badge">
+                            <input type="tel" id="settingsOwnerPhoneNumber" placeholder="9876543210"
+                                inputmode="numeric">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label for="settingsOwnerContact">Contact (Email/Mobile)</label>
+                    <input type="text" id="settingsOwnerContact" placeholder="Contact">
+                    <p class="auth-hint">Legacy contact field retained for backward compatibility.</p>
+                </div>
+
+                <div class="settings-group">
+                    <label for="settingsOwnerPassword">Change Password (Optional)</label>
+                    <input type="password" id="settingsOwnerPassword"
+                        placeholder="Leave blank to keep current password">
+                </div>
+
+                <button class="btn-save-settings" onclick="saveSettings()">&#128190; Save Changes</button>
+            </div>
+        </div>
+
+        <div id="reviews-section" class="section">
+            <div id="reviews-container"></div>
+        </div>
+
+        <div id="analytics-section" class="section">
+            <div class="analytics-header">
+                <h2>Analytics Dashboard</h2>
+                <div class="analytics-controls">
+                    <select id="analyticsTimeFilter" onchange="onAnalyticsFilterChange()">
+                        <option value="1">Today</option>
+                        <option value="7" selected>Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                        <option value="365">Last 1 Year</option>
+                    </select>
+                    <button class="btn-export" onclick="downloadAnalyticsReport()">Download Report</button>
+                </div>
+            </div>
+
+            <div id="analyticsLoading" class="analytics-loading">Loading analytics data...</div>
+
+            <div id="analyticsContent" style="display:none;">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-icon-text">Revenue</div>
+                        <div class="analytics-label">Total Revenue</div>
+                        <div class="analytics-value">&#8377;<span id="filteredRevenue">0</span></div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-icon-text">Orders</div>
+                        <div class="analytics-label">Total Orders</div>
+                        <div class="analytics-value"><span id="totalOrders">0</span></div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-icon-text">Items</div>
+                        <div class="analytics-label">Items Sold</div>
+                        <div class="analytics-value"><span id="totalItems">0</span></div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-icon-text">Avg</div>
+                        <div class="analytics-label">Avg Order Value</div>
+                        <div class="analytics-value">&#8377;<span id="avgOrderValue">0</span></div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-icon-text">Top</div>
+                        <div class="analytics-label">Top Selling Item</div>
+                        <div class="analytics-value analytics-value-sm"><span id="topItem">-</span></div>
+                    </div>
+                </div>
+
+                <div class="analytics-charts-row">
+                    <div class="analytics-chart-container">
+                        <h3>Revenue Trend</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="analytics-chart-container">
+                        <h3>Top Items by Orders</h3>
+                        <canvas id="itemChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-table-container">
+                    <h3>Item Performance</h3>
+                    <div id="analyticsEmptyState" class="analytics-empty" style="display:none;">No order data available
+                        for the selected period.</div>
+                    <table id="itemStatsTable" class="analytics-table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Orders</th>
+                                <th>Revenue (&#8377;)</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemStatsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ STAFF MANAGEMENT SECTION ═══ -->
+        <div id="staff-section" class="section">
+            <div class="staff-header-bar">
+                <h2>👥 Staff Management</h2>
+                <div class="staff-counts">
+                    <span>Total: <strong id="staffTotalCount">0</strong></span>
+                    <span>Active: <strong id="staffActiveCount">0</strong></span>
+                </div>
+            </div>
+
+            <div id="staffSuccessMsg" class="staff-success-msg" style="display:none;"></div>
+
+            <!-- Add Staff Form -->
+            <form id="addStaffForm" class="staff-form" onsubmit="addStaff(event)">
+                <h3>➕ Add New Staff Member</h3>
+                <div id="staffFormError" class="staff-form-error" style="display:none;"></div>
+                <div class="staff-form-grid">
+                    <div class="staff-form-group">
+                        <label for="staffId">Staff ID *</label>
+                        <input type="text" id="staffId" placeholder="e.g., S001" required>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffName">Full Name *</label>
+                        <input type="text" id="staffName" placeholder="e.g., Sandeep L" required>
+                    </div>
+                    <div class="staff-78-group">
+                        <label for="staffPhone">Phone Number *</label>
+                        <input type="tel" id="staffPhone" placeholder="10-digit number" maxlength="10"
+                            inputmode="numeric" required>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffWorkType">Work Type *</label>
+                        <select id="staffWorkType" required>
+                            <option value="">Select Work Type</option>
+                            <option value="chef">Chef</option>
+                            <option value="cook">Cook</option>
+                            <option value="server">Server</option>
+                            <option value="cleaner">Cleaner</option>
+                            <option value="cashier">Cashier</option>
+                            <option value="host">Host</option>
+                            <option value="bartender">Bartender</option>
+                            <option value="delivery">Delivery</option>
+                        </select>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffAge">Age *</label>
+                        <input type="number" id="staffAge" placeholder="e.g., 25" min="18" required>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffJoiningDate">Joining Date *</label>
+                        <input type="date" id="staffJoiningDate" required>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffSalary">Monthly Salary (₹) *</label>
+                        <input type="number" id="staffSalary" placeholder="e.g., 15000" min="1" required>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="staffSalaryDay">Salary Day (1-28)</label>
+                        <input type="number" id="staffSalaryDay" value="1" min="1" max="28">
+                    </div>
+                </div>
+                <button type="submit" class="btn-add-staff">➕ Add Staff Member</button>
+            </form>
+
+            <!-- Staff Filters -->
+            <div class="staff-filter-bar">
+                <input type="text" id="staffSearchInput" placeholder="🔍 Search by name..." oninput="onStaffSearch()">
+                <select id="staffFilterWorkType" onchange="onStaffFilterWorkType()">
+                    <option value="">All Work Types</option>
+                    <option value="chef">Chef</option>
+                    <option value="cook">Cook</option>
+                    <option value="server">Server</option>
+                    <option value="cleaner">Cleaner</option>
+                    <option value="cashier">Cashier</option>
+                    <option value="host">Host</option>
+                    <option value="bartender">Bartender</option>
+                    <option value="delivery">Delivery</option>
+                </select>
+            </div>
+
+            <!-- Staff Table -->
+            <div class="staff-table-wrapper">
+                <div id="staff-table-container"></div>
+            </div>
+        </div>
+
+        <!-- ═══ ORDER HISTORY SECTION ═══ -->
+        <div id="orderhistory-section" class="section">
+            <div class="oh-header">
+                <h2>📜 Order History</h2>
+            </div>
+
+            <div class="oh-filter-bar">
+                <div class="oh-filter-group">
+                    <label for="ohStartDate">Start Date</label>
+                    <input type="date" id="ohStartDate">
+                </div>
+                <div class="oh-filter-group">
+                    <label for="ohEndDate">End Date</label>
+                    <input type="date" id="ohEndDate">
+                </div>
+                <button class="btn-oh-search" onclick="searchOrderHistory()">🔍 Search</button>
+                <button class="btn-oh-clear" onclick="clearOrderHistoryFilter()">Clear</button>
+            </div>
+
+            <div id="ohError" class="oh-error" style="display:none;"></div>
+
+            <div id="order-history-results">
+                <div class="empty-state">
+                    <h3>Select a date range</h3>
+                    <p>Use the filters above to view order history</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ═══ STAFF EDIT MODAL ═══ -->
+    <div id="staffEditModal" class="modal" onclick="if(event.target===this) closeStaffEditModal()">
+        <div class="modal-content staff-edit-modal-content">
+            <div class="modal-header">Edit Staff Member</div>
+            <div class="modal-body">
+                <div id="staffEditError" class="staff-form-error" style="display:none;"></div>
+                <div class="staff-form-grid">
+                    <div class="staff-form-group">
+                        <label for="editStaffId">Staff ID</label>
+                        <input type="text" id="editStaffId">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffName">Full Name</label>
+                        <input type="text" id="editStaffName">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffPhone">Phone Number</label>
+                        <input type="tel" id="editStaffPhone" maxlength="10">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffWorkType">Work Type</label>
+                        <select id="editStaffWorkType">
+                            <option value="chef">Chef</option>
+                            <option value="cook">Cook</option>
+                            <option value="server">Server</option>
+                            <option value="cleaner">Cleaner</option>
+                            <option value="cashier">Cashier</option>
+                            <option value="host">Host</option>
+                            <option value="bartender">Bartender</option>
+                            <option value="delivery">Delivery</option>
+                        </select>
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffAge">Age</label>
+                        <input type="number" id="editStaffAge" min="18">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffJoiningDate">Joining Date</label>
+                        <input type="date" id="editStaffJoiningDate">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffSalary">Monthly Salary (₹)</label>
+                        <input type="number" id="editStaffSalary" min="1">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffSalaryDay">Salary Day (1-28)</label>
+                        <input type="number" id="editStaffSalaryDay" min="1" max="28">
+                    </div>
+                    <div class="staff-form-group">
+                        <label for="editStaffStatus">Status</label>
+                        <select id="editStaffStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveStaffEdit()">Save Changes</button>
+                <button class="btn-cancel" onclick="closeStaffEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Menu Item</div>
+            <div class="modal-body">
+                <label>Item Name</label>
+                <input type="text" id="editItemName">
+                <label>Price (&#8377;)</label>
+                <input type="number" id="editItemPrice" min="0">
+                <label>Category</label>
+                <select id="editItemCategory">
+                    <option value="Starters">&#11088; Starters</option>
+                    <option value="Main Course">&#127835; Main Course</option>
+                    <option value="Indian Breads">&#129747; Indian Breads</option>
+                    <option value="Rice">&#127834; Rice</option>
+                    <option value="Snacks">&#127839; Snacks</option>
+                    <option value="Desserts">&#127854; Desserts</option>
+                    <option value="Drinks">&#129380; Drinks</option>
+                </select>
+                <label>Type</label>
+                <div class="radio-group" style="margin-bottom: 15px;">
+                    <label>
+                        <input type="radio" name="editItemType" value="veg" id="editTypeVeg">
+                        &#128994; Veg
+                    </label>
+                    <label>
+                        <input type="radio" name="editItemType" value="nonveg" id="editTypeNonVeg">
+                        &#128308; Non-Veg
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+                <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="changeImageInput" accept="image/*" style="display: none;"
+        onchange="handleImageChange(event)">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="../firebase-config.js"></script>
+    <script src="../default-menu-dataset.js"></script>
+    <script src="owner-dashboard.js"></script>
+    <script type="module" src="staff-management.js"></script>
+    <script src="order-history.js"></script>
+</body>
+
+</html>
