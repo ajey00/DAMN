@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Review &amp; Feedback</title>
+    <link rel="stylesheet" href="customer-menu.css">
+    <style>
+        .review-page { min-height:100vh; background:linear-gradient(135deg,#fff5f0 0%,#ffe8db 100%); }
+        .review-container { max-width:600px; margin:0 auto; padding:2rem 1.5rem; }
+        .review-hero { text-align:center; margin-bottom:2rem; }
+        .review-hero h2 { font-size:2rem; color:#2c2c2c; margin-bottom:.5rem; }
+        .review-hero p { color:#666; font-size:1rem; }
+        .review-form-card { background:white; border-radius:15px; padding:2rem; box-shadow:0 4px 20px rgba(0,0,0,.1); }
+        .review-form-group { margin-bottom:1.5rem; }
+        .review-form-group label { display:block; font-size:1rem; font-weight:600; color:#2c2c2c; margin-bottom:.5rem; }
+        .review-form-group label .optional-tag { font-weight:400; color:#999; font-size:.85rem; }
+        .review-input,
+        .review-textarea {
+            width:100%;
+            padding:.9rem 1rem;
+            border:2px solid #e0e0e0;
+            border-radius:10px;
+            font-size:1rem;
+            font-family:'Poppins',sans-serif;
+            transition:all .3s ease;
+            background:#fafafa;
+        }
+        .review-input:focus,
+        .review-textarea:focus {
+            outline:none;
+            border-color:#ff6b35;
+            box-shadow:0 0 0 3px rgba(255,107,53,.1);
+            background:#fff;
+        }
+        .review-input::placeholder,
+        .review-textarea::placeholder { color:#999; }
+        .review-input[readonly] { background:#f0f0f0; color:#666; cursor:not-allowed; }
+        .review-textarea { min-height:120px; resize:vertical; }
+        .star-rating-container { display:flex; gap:8px; justify-content:center; padding:.5rem 0; }
+        .star-rating-container .star {
+            font-size:2.5rem;
+            cursor:pointer;
+            color:#ddd;
+            transition:all .2s ease;
+            user-select:none;
+        }
+        .star-rating-container .star:hover,
+        .star-rating-container .star.active { color:#f7b731; transform:scale(1.15); }
+        .star-rating-container .star.active { text-shadow:0 0 8px rgba(247,183,49,.4); }
+        .rating-text { text-align:center; color:#999; font-size:.9rem; margin-top:.5rem; }
+        .review-submit-btn {
+            width:100%;
+            background:linear-gradient(135deg,#ff6b35 0%,#f7931e 100%);
+            color:white;
+            border:none;
+            padding:1.1rem;
+            border-radius:30px;
+            font-size:1.1rem;
+            font-weight:700;
+            cursor:pointer;
+            transition:all .3s ease;
+            margin-top:.5rem;
+        }
+        .review-submit-btn:hover { transform:translateY(-2px); box-shadow:0 6px 25px rgba(255,107,53,.4); }
+        .review-submit-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+        .review-back-link {
+            display:block;
+            text-align:center;
+            margin-top:1.5rem;
+            color:#ff6b35;
+            font-weight:600;
+            text-decoration:none;
+            font-size:1rem;
+            transition:color .3s ease;
+        }
+        .review-back-link:hover { color:#f7931e; }
+        .review-toast {
+            position:fixed;
+            bottom:-100px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#4caf50;
+            color:white;
+            padding:1rem 2rem;
+            border-radius:50px;
+            box-shadow:0 4px 20px rgba(0,0,0,.3);
+            transition:all .4s ease;
+            z-index:1000;
+            font-weight:500;
+            max-width:90%;
+        }
+        .review-toast.show { bottom:30px; }
+        .review-toast.error { background:#e74c3c; }
+        @media (max-width:768px) {
+            .review-container { padding:1rem; }
+            .review-hero h2 { font-size:1.5rem; }
+            .review-form-card { padding:1.5rem; }
+            .star-rating-container .star { font-size:2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="review-page">
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <h1>&#127869;&#65039; Customer Review</h1>
+                <p>We value your feedback</p>
+            </div>
+            <a href="index.html" class="back-button">&#8592; Back to Menu</a>
+        </div>
+    </header>
+
+    <div class="review-container">
+        <div class="review-hero">
+            <h2>&#128221; Customer Review &amp; Feedback</h2>
+            <p>Tell us about your dining experience</p>
+        </div>
+
+        <div class="review-form-card">
+            <div class="review-form-group">
+                <label for="reviewName">Your Name <span class="optional-tag">(optional)</span></label>
+                <input type="text" id="reviewName" class="review-input" placeholder="e.g., Rahul Sharma">
+            </div>
+
+            <div class="review-form-group">
+                <label for="reviewTable">Table Number</label>
+                <input type="text" id="reviewTable" class="review-input" placeholder="e.g., 5">
+            </div>
+
+            <div class="review-form-group">
+                <label>&#11088; Rate Your Experience</label>
+                <div class="star-rating-container" id="starRating">
+                    <span class="star" data-value="1" onclick="setReviewRating(1)" onmouseenter="hoverStars(1)" onmouseleave="resetStarHover()">&#9733;</span>
+                    <span class="star" data-value="2" onclick="setReviewRating(2)" onmouseenter="hoverStars(2)" onmouseleave="resetStarHover()">&#9733;</span>
+                    <span class="star" data-value="3" onclick="setReviewRating(3)" onmouseenter="hoverStars(3)" onmouseleave="resetStarHover()">&#9733;</span>
+                    <span class="star" data-value="4" onclick="setReviewRating(4)" onmouseenter="hoverStars(4)" onmouseleave="resetStarHover()">&#9733;</span>
+                    <span class="star" data-value="5" onclick="setReviewRating(5)" onmouseenter="hoverStars(5)" onmouseleave="resetStarHover()">&#9733;</span>
+                </div>
+                <p class="rating-text" id="ratingText">Tap a star to rate</p>
+            </div>
+
+            <div class="review-form-group">
+                <label for="reviewFeedback">Your Feedback <span class="optional-tag">(optional)</span></label>
+                <textarea id="reviewFeedback" class="review-textarea"
+                          placeholder="Tell us what you loved or what we can improve..."></textarea>
+            </div>
+
+            <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">
+                &#128233; Submit Feedback
+            </button>
+
+            <a href="index.html" class="review-back-link">&#8592; Return to Menu</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Restaurant. All rights reserved.</p>
+        <p>Made with &#10084;&#65039; for food lovers</p>
+    </footer>
+</div>
+
+<div class="review-toast" id="reviewToast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="firebase-config.js"></script>
+<script src="review.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Menu</title>
+    <link rel="stylesheet" href="customer-menu.css">
+</head>
+<body>
+
+<!-- Menu Page -->
+<div id="menuPage">
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <h1>Restaurant Menu</h1>
+                <p>Fresh &amp; Delicious Food</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <a href="review.html" id="reviewLink" class="cart-button" style="text-decoration:none; color:#ff6b35;">Give Review</a>
+                <button class="cart-button" onclick="goToCheckout()">
+                    View Cart
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h2>Our Delicious Menu</h2>
+            <p>Fresh ingredients, bold flavors, unforgettable experience</p>
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn active" onclick="filterMenuGlobal('all', event)">All</button>
+            <button class="filter-btn" onclick="filterMenuGlobal('veg', event)">Veg</button>
+            <button class="filter-btn" onclick="filterMenuGlobal('nonveg', event)">Non-Veg</button>
+        </div>
+
+        <div id="menuContainer"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Restaurant. All rights reserved.</p>
+        <p>Made with love for food lovers</p>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+</div>
+
+<!-- Checkout Page -->
+<div id="checkoutPage" style="display:none;">
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <h1>Checkout</h1>
+                <p>Complete your order</p>
+            </div>
+            <a onclick="goBackToMenu()" class="back-button">&#8592; Back to Menu</a>
+        </div>
+    </header>
+
+    <main>
+        <h1 class="checkout-title">Your Cart</h1>
+        <div class="checkout-container">
+            <div class="cart-section">
+                <h2 class="section-title">Cart Items</h2>
+                <div id="cartItems"></div>
+            </div>
+
+            <div class="summary-section">
+                <h2 class="section-title">Order Summary</h2>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">&#8377;0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax (5%):</span>
+                    <span id="tax">&#8377;0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span class="amount" id="total">&#8377;0</span>
+                </div>
+
+                <div class="table-number-section">
+                    <h3 class="section-title">Table Information</h3>
+                    <div class="input-group">
+                        <label class="input-label" for="tableNumber">Enter Your Table Number</label>
+                        <input type="number" id="tableNumber" class="table-input"
+                               placeholder="e.g., 5" min="1">
+                        <p id="tableHint" class="table-hint">Loading available tables...</p>
+                    </div>
+                </div>
+
+                <div class="note-section">
+                    <h3 class="section-title">Special Instructions</h3>
+                    <div class="input-group">
+                        <label class="input-label" for="specialInstructions">Special Instructions</label>
+                        <textarea id="specialInstructions" class="note-input"
+                                  placeholder="e.g. No sugar, less spicy, no onion" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <button class="confirm-btn" id="confirmOrderBtn" onclick="confirmOrder()">Place Order</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Restaurant. All rights reserved.</p>
+    </footer>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="success-icon">&#10003;</div>
+            <h2>Order Confirmed!</h2>
+            <p>Thank you for your order!<br>Your delicious food will be ready soon.</p>
+            <button class="modal-btn" onclick="goBackToMenuFromModal()">Order More</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="firebase-config.js"></script>
+<script src="default-menu-dataset.js"></script>
+<script src="customer-menu.js"></script>
+
+</body>
+</html>
